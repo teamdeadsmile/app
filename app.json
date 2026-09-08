@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "DEADSMILE",
+    "slug": "deadsmile-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "deadsmile",
+    "userInterfaceStyle": "dark",
+    "android": {
+      "package": "com.deadsmile.games",
+      "adaptiveIcon": {
+        "backgroundColor": "#f80202",
+        "foregroundImage": "./assets/branding/icons/icon.png",
+        "monochromeImage": "./assets/branding/icons/mono.png"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f80202",
+          "image": "./assets/branding/icons/splash.png",
+          "imageWidth": 120
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a176259e-0a34-4e97-876b-648a315b6835"
+      }
+    }
+  }
+}

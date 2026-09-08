@@ -1,88 +1,136 @@
 import { Tabs } from "expo-router";
-import { MaterialIcon } from "../../src/components/MaterialIcon";
-import { colors, type } from "../../src/theme/tokens";
+import { Pressable, View, StyleSheet } from "react-native";
+import { colors } from "../../src/theme/tokens";
+import {
+  House,
+  GameController,
+  VideoCamera,
+  Newspaper,
+  Heart,
+} from "phosphor-react-native";
 
-const icon = (name) => ({ color, size }) => (
-    <MaterialIcon name={name} color={color} size={size} />
+const icon = (IconComponent) => ({ color, size }) => (
+  <IconComponent weight="bold" color={color} size={size} />
 );
 
+// Botão customizado que força centralização vertical
+const CustomTabButton = ({ children, onPress, accessibilityState }) => {
+  const isFocused = accessibilityState?.selected;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.tabButton,
+        pressed && { opacity: 0.6 },
+        isFocused && styles.tabButtonFocused,
+      ]}
+    >
+      <View style={styles.iconWrapper}>{children}</View>
+    </Pressable>
+  );
+};
+
 export default function TabLayout() {
-    return (
-        <Tabs
-            screenOptions={{
-                headerShown: false,
+  return (
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.onSurfaceVariant,
 
-                tabBarActiveTintColor: colors.primary,
-                tabBarInactiveTintColor: colors.onSurfaceVariant,
+        tabBarStyle: {
+          position: "absolute",
+          height: 64,
+          backgroundColor: colors.surfaceContainer,
+          borderWidth: 2,
+          borderColor: colors.surfaceContainerHigh,
+          borderRadius: 40,
+          alignSelf: "center",
+          marginHorizontal: 56,
+          marginBottom: 36,
+          paddingHorizontal: 12, // padding interno
+          paddingVertical: 0,
+          elevation: 4,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 6,
+        },
 
-                tabBarStyle: {
-                    position: "absolute",
-                    height: 76,
-                    paddingTop: 8,
-                    paddingBottom: 8,
-
-                    backgroundColor: colors.surfaceContainer,
-
-                    borderTopWidth: 0,
-                    borderRadius: 28,
-
-                    marginHorizontal: 12,
-                    marginBottom: 10,
-
-                    elevation: 0,
-                    shadowOpacity: 0,
-                },
-
-                tabBarItemStyle: {
-                    borderRadius: 22,
-                    marginHorizontal: 2,
-                },
-
-                tabBarLabelStyle: {
-                    fontFamily: type.bodyBold,
-                    fontSize: 10,
-                },
-            }}
-        >
-            <Tabs.Screen
-                name="index"
-                options={{
-                    title: "Home",
-                    tabBarIcon: icon("home"),
-                }}
-            />
-
-            <Tabs.Screen
-                name="games"
-                options={{
-                    title: "Games",
-                    tabBarIcon: icon("sports-esports"),
-                }}
-            />
-
-            <Tabs.Screen
-                name="videos"
-                options={{
-                    title: "Videos",
-                    tabBarIcon: icon("play-circle"),
-                }}
-            />
-
-            <Tabs.Screen
-                name="newswire"
-                options={{
-                    title: "Newswire",
-                    tabBarIcon: icon("newspaper"),
-                }}
-            />
-
-            <Tabs.Screen
-                name="wishlist"
-                options={{
-                    title: "Wishlist",
-                    tabBarIcon: icon("favorite"),
-                }}
-            />
-        </Tabs>
-    );
+        // Remove estilos internos que podem interferir
+        tabBarItemStyle: {
+          padding: 0,
+          margin: 0,
+          height: 64,
+        },
+        tabBarIconStyle: {
+          margin: 0,
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: icon(House),
+          tabBarButton: (props) => <CustomTabButton {...props} />,
+        }}
+      />
+      <Tabs.Screen
+        name="games"
+        options={{
+          title: "Games",
+          tabBarIcon: icon(GameController),
+          tabBarButton: (props) => <CustomTabButton {...props} />,
+        }}
+      />
+      <Tabs.Screen
+        name="videos"
+        options={{
+          title: "Videos",
+          tabBarIcon: icon(VideoCamera),
+          tabBarButton: (props) => <CustomTabButton {...props} />,
+        }}
+      />
+      <Tabs.Screen
+        name="newswire"
+        options={{
+          title: "Newswire",
+          tabBarIcon: icon(Newspaper),
+          tabBarButton: (props) => <CustomTabButton {...props} />,
+        }}
+      />
+      <Tabs.Screen
+        name="wishlist"
+        options={{
+          title: "Wishlist",
+          tabBarIcon: icon(Heart),
+          tabBarButton: (props) => <CustomTabButton {...props} />,
+        }}
+      />
+    </Tabs>
+  );
 }
+
+const styles = StyleSheet.create({
+  tabButton: {
+    flex: 1,
+    height: 64, // mesma altura da barra
+    justifyContent: "flex-start",
+    paddingTop: 12,
+    alignItems: "center",
+    borderRadius: 30,
+    paddingHorizontal: 2,
+  },
+  tabButtonFocused: {
+    backgroundColor: colors.primaryContainer,
+  },
+  iconWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 36,
+    height: 36,
+  },
+});

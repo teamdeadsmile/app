@@ -1,7 +1,144 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { MaterialIcon } from "../src/components/MaterialIcon";
-import { Screen } from '../src/components/Screen'; import { BrandMark } from '../src/components/BrandMark'; import { useAuth } from '../src/context/AuthContext'; import { colors,radius,type } from '../src/theme/tokens';
-export default function Login(){const r=useRouter();const {login}=useAuth();const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [error,setError]=useState('');const [busy,setBusy]=useState(false);async function submit(){if(!email||!password)return;setBusy(true);setError('');try{await login(email.trim(),password);r.back();}catch(e){setError(e.message||'Unable to sign in.');}finally{setBusy(false)}}return <Screen><Pressable onPress={()=>r.back()} style={s.back}><MaterialIcon name="arrow-back" size={22} color={colors.onSurface} /></Pressable><View style={s.card}><BrandMark size={54} color={colors.primary}/><Text style={s.title}>Welcome back.</Text><Text style={s.copy}>Use the same account as the DEADSMILE website.</Text><View style={s.field}><Text style={s.label}>Email</Text><TextInput value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" placeholder="you@example.com" placeholderTextColor={colors.onSurfaceVariant} style={s.input}/></View><View style={s.field}><Text style={s.label}>Password</Text><TextInput value={password} onChangeText={setPassword} secureTextEntry placeholder="••••••••" placeholderTextColor={colors.onSurfaceVariant} style={s.input}/></View>{error?<Text style={s.error}>{error}</Text>:null}<Pressable onPress={submit} disabled={busy} style={s.button}><Text style={s.buttonText}>{busy?'Signing in…':'Sign in'}</Text></Pressable></View></Screen>}
-const s=StyleSheet.create({back:{width:48,height:48,borderRadius:24,backgroundColor:colors.surfaceContainer,alignItems:'center',justifyContent:'center'},card:{marginTop:24,alignSelf:'center',width:'100%',maxWidth:520,borderRadius:radius.xl,backgroundColor:colors.surface,padding:26,gap:16},title:{fontFamily:type.display,color:colors.onSurface,fontSize:40,letterSpacing:-1.8},copy:{fontFamily:type.body,color:colors.onSurfaceVariant},field:{gap:7},label:{fontFamily:type.bodyBold,color:colors.onSurfaceVariant,fontSize:11,letterSpacing:.8,textTransform:'uppercase'},input:{height:54,borderRadius:radius.md,backgroundColor:colors.surfaceContainerHigh,paddingHorizontal:16,color:colors.onSurface,fontFamily:type.body},error:{fontFamily:type.body,color:colors.error},button:{height:52,borderRadius:26,backgroundColor:colors.primary,alignItems:'center',justifyContent:'center'},buttonText:{fontFamily:type.bodyBold,color:colors.onPrimary}});
+import { ArrowLeft } from 'phosphor-react-native';
+import { Screen } from '../src/components/Screen';
+import { BrandMark } from '../src/components/BrandMark';
+import { useAuth } from '../src/context/AuthContext';
+import { useGoBack } from '../src/hooks/useGoBack';
+import { colors, radius, type } from '../src/theme/tokens';
+
+export default function Login() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  // ✅ Chama o hook e guarda a função
+  const goBack = useGoBack('/');
+
+  async function submit() {
+    if (!email || !password) return;
+    setBusy(true);
+    setError('');
+    try {
+      await login(email.trim(), password);
+      goBack(); // ✅ usa a função segura
+    } catch (e) {
+      setError(e.message || 'Unable to sign in.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Screen>
+      <Pressable onPress={goBack} style={s.back}>
+        <ArrowLeft size={22} color={colors.onSurface} weight="bold" />
+      </Pressable>
+
+      <View style={s.card}>
+        <BrandMark size={54} color={colors.primary} />
+        <Text style={s.title}>Welcome back.</Text>
+        <Text style={s.copy}>Use the same account as the DEADSMILE website.</Text>
+
+        <View style={s.field}>
+          <Text style={s.label}>Email</Text>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            placeholder="you@example.com"
+            placeholderTextColor={colors.onSurfaceVariant}
+            style={s.input}
+          />
+        </View>
+
+        <View style={s.field}>
+          <Text style={s.label}>Password</Text>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholder="••••••••"
+            placeholderTextColor={colors.onSurfaceVariant}
+            style={s.input}
+          />
+        </View>
+
+        {error ? <Text style={s.error}>{error}</Text> : null}
+
+        <Pressable onPress={submit} disabled={busy} style={s.button}>
+          <Text style={s.buttonText}>{busy ? 'Signing in…' : 'Sign in'}</Text>
+        </Pressable>
+      </View>
+    </Screen>
+  );
+}
+
+const s = StyleSheet.create({
+  back: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.surfaceContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  card: {
+    marginTop: 24,
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 520,
+    borderRadius: radius.xl,
+    backgroundColor: colors.surface,
+    padding: 26,
+    gap: 16,
+  },
+  title: {
+    fontFamily: type.display,
+    color: colors.onSurface,
+    fontSize: 40,
+    letterSpacing: -1.8,
+  },
+  copy: {
+    fontFamily: type.body,
+    color: colors.onSurfaceVariant,
+  },
+  field: {
+    gap: 7,
+  },
+  label: {
+    fontFamily: type.bodyBold,
+    color: colors.onSurfaceVariant,
+    fontSize: 11,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  input: {
+    height: 54,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceContainerHigh,
+    paddingHorizontal: 16,
+    color: colors.onSurface,
+    fontFamily: type.body,
+  },
+  error: {
+    fontFamily: type.body,
+    color: colors.error,
+  },
+  button: {
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    fontFamily: type.bodyBold,
+    color: colors.onPrimary,
+  },
+});

@@ -33,7 +33,7 @@ export default function Games() {
       ) : games.length > 0 ? (
         <View style={s.grid}>
           {games.map((game, index) => (
-            <View key={game.id} style={{ width: '100%' }}>
+            <View key={game.id} style={cols > 1 ? { width: `${100 / cols - 2}%`, flexGrow: 1 } : { width: '100%' }}>
                 <GameCard game={game} index={index} />
             </View>
             ))}

@@ -7,6 +7,7 @@ import { StateView } from '../../src/components/StateView';
 import { useApiData } from '../../src/hooks/useApiData';
 import { colors, radius, type } from '../../src/theme/tokens';
 import { formatDate } from '../../src/utils/content';
+import { resolveAssetUrl } from '../../src/utils/resolveAsset';
 import { useGoBack } from '../../src/hooks/useGoBack';
 
 export default function VideoDetail() {
@@ -30,9 +31,9 @@ export default function VideoDetail() {
       ) : (
         <>
           <View style={s.media}>
-            {v.thumbnail ? (
+            {resolveAssetUrl(v.thumbnail) ? (
               <Image
-                source={{ uri: v.thumbnail }}
+                source={{ uri: resolveAssetUrl(v.thumbnail) }}
                 style={StyleSheet.absoluteFill}
                 contentFit="cover"
               />

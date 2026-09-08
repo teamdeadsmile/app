@@ -2,6 +2,7 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcon } from "../src/components/MaterialIcon";
 import { Screen } from '../src/components/Screen';
+import { StateView } from '../src/components/StateView';
 import { useAuth } from '../src/context/AuthContext';
 import { SITE_URL } from '../src/services/api';
 import { colors, radius, type } from '../src/theme/tokens';
@@ -28,7 +29,9 @@ export default function Account() {
         <Text style={s.title}>Account</Text>
       </View>
 
-      {status === 'authenticated' ? (
+      {status === 'loading' ? (
+        <StateView loading />
+      ) : status === 'authenticated' ? (
         <View style={s.card}>
           <Text style={s.name}>@{user.username}</Text>
           <Text style={s.email}>{user.email}</Text>

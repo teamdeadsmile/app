@@ -7,10 +7,18 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal"
-      
     },
     "preview": {
       "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "channel": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://apideadsmile.vercel.app/api",
+        "EXPO_PUBLIC_SITE_URL": "https://deadsmile.vercel.app"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
       "android": {
         "buildType": "apk"
       },
@@ -18,9 +26,6 @@
         "EXPO_PUBLIC_API_URL": "https://apideadsmile.vercel.app/api",
         "EXPO_PUBLIC_SITE_URL": "https://deadsmile.vercel.app"
       }
-    },
-    "production": {
-      "autoIncrement": true
     }
   },
   "submit": {

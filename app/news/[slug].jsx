@@ -7,6 +7,7 @@ import { StateView } from '../../src/components/StateView';
 import { useApiData } from '../../src/hooks/useApiData';
 import { colors, radius, type } from '../../src/theme/tokens';
 import { formatDate } from '../../src/utils/content';
+import { resolveAssetUrl } from '../../src/utils/resolveAsset';
 import { useGoBack } from '../../src/hooks/useGoBack';
 
 export default function NewsDetail() {
@@ -37,8 +38,8 @@ export default function NewsDetail() {
             {item.excerpt && <Text style={s.lead}>{item.excerpt}</Text>}
           </View>
 
-          {item.image && (
-            <Image source={{ uri: item.image }} style={s.image} contentFit="cover" />
+          {resolveAssetUrl(item.image) && (
+            <Image source={{ uri: resolveAssetUrl(item.image) }} style={s.image} contentFit="cover" />
           )}
 
           <View style={s.article}>

@@ -57,7 +57,7 @@ const s = StyleSheet.create({
         width: '100%',
     },
   wrapH: {
-    width: 250,
+    width: '100%',
   },
   card: {
     width: '100%',
@@ -74,6 +74,7 @@ const s = StyleSheet.create({
     backgroundColor: colors.surfaceContainer,
     position: 'relative',
     maxHeight: 300,
+    width: '100%',
   },
   placeholder: {
     flex: 1,

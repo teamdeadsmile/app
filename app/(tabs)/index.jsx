@@ -180,7 +180,7 @@ const s = StyleSheet.create({
     },
     heroShade: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(0,0,0,.49)",
+        backgroundColor: "rgba(0,0,0,.69)",
     },
     heroBody: { padding: 24, paddingTop: 130, maxWidth: 720 },
     overline: {

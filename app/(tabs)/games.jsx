@@ -20,8 +20,7 @@ export default function Games() {
       <View style={s.head}>
         <Text style={s.title}>Games</Text>
         <Text style={s.copy}>
-          All games published by the API, with details, platforms,
-          screenshots, trailers, and official links.
+          All games with details, platforms, screenshots, trailers, and official links.
         </Text>
       </View>
 

@@ -65,7 +65,7 @@ export default function Search() {
 
       <View style={s.grid}>
         {items.map((g, i) => (
-          <View key={g.id} style={{ width: `${100 / cols - 1.6}%` }}>
+          <View key={g.id} style={{ width: '100%' }}>
             <GameCard
               game={{
                 ...g,

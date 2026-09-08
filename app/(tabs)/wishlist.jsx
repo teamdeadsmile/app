@@ -27,7 +27,7 @@ export default function Wishlist() {
             <View style={s.head}>
                 <Text style={s.title}>Wishlist</Text>
                 <Text style={s.copy}>
-                    Games you saved to the same account as the website.
+                    Games you saved.
                 </Text>
             </View>
             {status === "loading" ? (

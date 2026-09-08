@@ -16,7 +16,7 @@ export function TopBar({ title, back = false }) {
             <MaterialIcon name="arrow-back" size={22} color={colors.onSurface} />
           </Pressable>
         ) : (
-          <BrandMark size={40} />
+          <BrandMark size={50} />
         )}
       </View>
 
@@ -38,7 +38,7 @@ export function TopBar({ title, back = false }) {
 
 const styles = StyleSheet.create({
   bar: {
-    height: 64,
+    height: 74,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

@@ -7,6 +7,7 @@ import { GameCard } from '../src/components/GameCard';
 import { api } from '../src/services/api';
 import { colors, radius, type } from '../src/theme/tokens';
 import { useGoBack } from '../src/hooks/useGoBack';
+import { resolveAssetUrl } from '../src/utils/resolveAsset';
 
 export default function Search() {
   const router = useRouter();
@@ -34,8 +35,11 @@ export default function Search() {
     }, 280);
     return () => clearTimeout(t);
   }, [q]);
-
   const cols = width >= 900 ? 4 : width >= 650 ? 3 : 2;
+  const gap = 12;
+  const screenPadding = 20;
+  const totalWidth = width - screenPadding * 2;
+  const itemWidth = (totalWidth - gap * (cols - 1)) / cols;
 
   return (
     <Screen>
@@ -65,11 +69,17 @@ export default function Search() {
 
       <View style={s.grid}>
         {items.map((g, i) => (
-          <View key={g.id} style={cols > 1 ? { width: `${100 / cols - 2}%`, flexGrow: 1 } : { width: '100%' }}>
+          <View
+            key={g.id}
+            style={{
+              width: '100%',
+              marginBottom: gap,
+            }}
+          >
             <GameCard
               game={{
                 ...g,
-                coverImage: g.coverImage || g.cover_image,
+                coverImage: resolveAssetUrl(g.coverImage || g.cover_image),
               }}
               index={i}
             />
@@ -89,6 +99,7 @@ const s = StyleSheet.create({
   back: {
     width: 48,
     height: 48,
+     marginTop: 12,
     borderRadius: 24,
     backgroundColor: colors.surfaceContainer,
     alignItems: 'center',
@@ -97,6 +108,7 @@ const s = StyleSheet.create({
   search: {
     flex: 1,
     height: 52,
+     marginTop: 12,
     borderRadius: 26,
     backgroundColor: colors.surfaceContainerHigh,
     paddingHorizontal: 16,
@@ -116,7 +128,7 @@ const s = StyleSheet.create({
     color: colors.onSurface,
     fontSize: 50,
     letterSpacing: -2.2,
-    marginTop: 24,
+     marginTop: 24,
   },
   copy: {
     fontFamily: type.body,

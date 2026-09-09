@@ -15,8 +15,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-
-  // ✅ Chama o hook e guarda a função
   const goBack = useGoBack('/');
 
   async function submit() {
@@ -25,7 +23,7 @@ export default function Login() {
     setError('');
     try {
       await login(email.trim(), password);
-      goBack(); // ✅ usa a função segura
+      goBack();
     } catch (e) {
       setError(e.message || 'Unable to sign in.');
     } finally {
@@ -89,7 +87,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   card: {
-    marginTop: 24,
+     marginTop: 12,
     alignSelf: 'center',
     width: '100%',
     maxWidth: 520,

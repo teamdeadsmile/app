@@ -84,11 +84,12 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
+    marginTop: 12,
   },
   media: {
     width: '100%',
     aspectRatio: 1.78,
-    borderRadius: radius.xl,
+    borderRadius: 24,
     overflow: 'hidden',
     backgroundColor: colors.surface,
     alignItems: 'center',

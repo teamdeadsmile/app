@@ -1,45 +1,19 @@
-import { useEffect } from 'react';
-import { Alert } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_700Bold } from '@expo-google-fonts/manrope';
 import { SpaceGrotesk_600SemiBold, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { AuthProvider } from '../src/context/AuthContext';
-import { colors } from '../src/theme/tokens';
+import { colors, type } from '../src/theme/tokens';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Updates from 'expo-updates';
-
-async function checkForUpdates() {
-  try {
-    const update = await Updates.checkForUpdateAsync();
-    if (update.isAvailable) {
-      Alert.alert(
-        'Update Available',
-        'A new version is ready. Would you like to download it now?',
-        [
-          { text: 'Later', style: 'cancel' },
-          {
-            text: 'Update',
-            onPress: async () => {
-              try {
-                await Updates.fetchUpdateAsync();
-                await Updates.reloadAsync();
-              } catch (error) {
-                Alert.alert('Error', 'Failed to download the update. Please try again later.');
-                console.error('Update error:', error);
-              }
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-    }
-  } catch (error) {
-    console.error('Error checking for updates:', error);
-  }
-}
+import * as SplashScreen from 'expo-splash-screen';
+SplashScreen.preventAutoHideAsync();
+const MIN_DISPLAY_TIME = 10000;
 
 export default function RootLayout() {
+  const [isUpdating, setIsUpdating] = useState(false);
   const [loaded] = useFonts({
     Manrope_400Regular,
     Manrope_500Medium,
@@ -48,11 +22,46 @@ export default function RootLayout() {
     SpaceGrotesk_700Bold,
   });
 
+  async function checkForUpdates() {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        const startTime = Date.now();
+        setIsUpdating(true);
+        await Updates.fetchUpdateAsync();
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, MIN_DISPLAY_TIME - elapsed);
+        if (remaining > 0) {
+          await new Promise((resolve) => setTimeout(resolve, remaining));
+        }
+        await Updates.reloadAsync();
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      setIsUpdating(false);
+    }
+  }
+
   useEffect(() => {
-    checkForUpdates();
+    if (loaded) {
+      SplashScreen.hideAsync();
+      checkForUpdates();
+    }
+  }, [loaded]);
+  useEffect(() => {
+    if (!loaded) return;
     const interval = setInterval(checkForUpdates, 18000000);
     return () => clearInterval(interval);
-  }, []);
+  }, [loaded]);
+
+  if (isUpdating) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.text}>Updating… Please wait</Text>
+      </View>
+    );
+  }
 
   if (!loaded) return null;
 
@@ -75,8 +84,26 @@ export default function RootLayout() {
           <Stack.Screen name="search" options={{ presentation: 'modal' }} />
           <Stack.Screen name="check-updates" options={{ presentation: 'modal' }} />
           <Stack.Screen name="login" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="admin/newsletter" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="admin/video" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="admin/game" options={{ presentation: 'modal' }} />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  text: {
+    fontFamily: type.body,
+    color: colors.onSurface,
+    fontSize: 16,
+  },
+});

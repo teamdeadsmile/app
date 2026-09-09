@@ -11,7 +11,12 @@ export default function Games() {
   const { width } = useWindowDimensions();
   const q = useApiData('/games', { limit: 40 }, { items: [] });
   const games = q.data?.items || [];
+
   const cols = width >= 1000 ? 4 : width >= 680 ? 3 : 2;
+  const gap = 12;
+  const screenPadding = 20;
+  const totalWidth = width - screenPadding * 2;
+  const itemWidth = Math.floor((totalWidth - gap * (cols - 1)) / cols);
 
   return (
     <Screen>
@@ -33,10 +38,23 @@ export default function Games() {
       ) : games.length > 0 ? (
         <View style={s.grid}>
           {games.map((game, index) => (
-            <View key={game.id} style={cols > 1 ? { width: `${100 / cols - 2}%`, flexGrow: 1 } : { width: '100%' }}>
-                <GameCard game={game} index={index} />
+            <View
+              key={game.id}
+              style={{
+                width: '100%',
+                marginBottom: gap,
+                flexShrink: 0,
+              }}
+            >
+              <GameCard
+                game={{
+                  ...game,
+                  coverImage: resolveAssetUrl(game.coverImage || game.heroImage),
+                }}
+                index={index}
+              />
             </View>
-            ))}
+          ))}
         </View>
       ) : (
         <StateView empty="No games available" />
@@ -49,12 +67,6 @@ const s = StyleSheet.create({
   head: {
     paddingVertical: 24,
     maxWidth: 720,
-  },
-  eyebrow: {
-    fontFamily: type.bodyBold,
-    color: colors.primary,
-    fontSize: 11,
-    letterSpacing: 1.4,
   },
   title: {
     fontFamily: type.display,
@@ -70,8 +82,10 @@ const s = StyleSheet.create({
     lineHeight: 22,
     marginTop: 12,
   },
-    grid: {
+  grid: {
+    flexDirection: 'column',
+    flexWrap: 'wrap',
     width: '100%',
     gap: 12,
-    },
+  },
 });

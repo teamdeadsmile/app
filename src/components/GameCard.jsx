@@ -7,7 +7,16 @@ import { resolveAssetUrl } from '../utils/resolveAsset';
 
 export function GameCard({ game, index = 0, horizontal = false }) {
   const router = useRouter();
-  const imageUrl = resolveAssetUrl(game.coverImage || game.cover_image || game.heroImage);
+
+  const imageSource =
+    game.coverImage ||
+    game.cover_image ||
+    game.heroImage ||
+    game.image ||
+    null;
+
+  const imageUrl = resolveAssetUrl(imageSource);
+  console.log('GameCard image:', { imageSource, imageUrl, gameTitle: game.title });
 
   return (
     <Animated.View
@@ -25,6 +34,7 @@ export function GameCard({ game, index = 0, horizontal = false }) {
               style={StyleSheet.absoluteFill}
               contentFit="cover"
               transition={220}
+              onError={(e) => console.warn('Image load error:', e)}
             />
           ) : (
             <View style={s.placeholder} />
@@ -53,9 +63,9 @@ export function GameCard({ game, index = 0, horizontal = false }) {
 }
 
 const s = StyleSheet.create({
-    wrap: {
-        width: '100%',
-    },
+  wrap: {
+    width: '100%',
+  },
   wrapH: {
     width: '100%',
   },
@@ -64,17 +74,17 @@ const s = StyleSheet.create({
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
     overflow: 'hidden',
-    },
+  },
   pressed: {
     transform: [{ scale: 0.985 }],
     opacity: 0.92,
   },
   media: {
     aspectRatio: 0.78,
+    width: '100%',
     backgroundColor: colors.surfaceContainer,
     position: 'relative',
-    maxHeight: 300,
-    width: '100%',
+    overflow: 'hidden',
   },
   placeholder: {
     flex: 1,

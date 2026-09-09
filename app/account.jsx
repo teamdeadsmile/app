@@ -19,13 +19,12 @@ export default function Account() {
   }
 
   return (
-    <Screen>
+    <Screen style={ s.container }>
       <Pressable onPress={goBack} style={s.back}>
         <MaterialIcon name="arrow-back" size={22} color={colors.onSurface} />
       </Pressable>
 
       <View style={s.head}>
-        <MaterialIcon name="account-circle" size={54} color={colors.primary} />
         <Text style={s.title}>Account</Text>
       </View>
 
@@ -71,6 +70,7 @@ const s = StyleSheet.create({
   back: {
     width: 48,
     height: 48,
+     marginTop: 12,
     borderRadius: 24,
     backgroundColor: colors.surfaceContainer,
     alignItems: 'center',
@@ -85,6 +85,8 @@ const s = StyleSheet.create({
     color: colors.onSurface,
     fontSize: 48,
     letterSpacing: -2,
+    width: '100%',
+    textAlign: 'center',
   },
   card: {
     borderRadius: radius.xl,

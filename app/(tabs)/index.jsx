@@ -34,15 +34,17 @@ export default function Home() {
             <TopBar />
             <Animated.View entering={FadeIn.duration(450)} style={s.hero}>
                 {heroUrl ? (
-                    <Image
-                        source={{ uri: heroUrl }}
-                        style={StyleSheet.absoluteFill}
-                        contentFit="cover"
-                    />
+                    <>
+                        <Image
+                            source={{ uri: heroUrl }}
+                            style={StyleSheet.absoluteFill}
+                            contentFit="cover"
+                        />
+                        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000', opacity: 0.70 }]} />
+                    </>
                 ) : (
                     <View style={s.heroFallback} />
                 )}
-                <View style={s.heroShade} />
                 <View style={s.heroBody}>
                     <Text
                         style={[
@@ -178,18 +180,7 @@ const s = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         backgroundColor: colors.surfaceContainerHigh,
     },
-    heroShade: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(0,0,0,.69)",
-    },
     heroBody: { padding: 24, paddingTop: 130, maxWidth: 720 },
-    overline: {
-        fontFamily: type.bodyBold,
-        color: colors.primary,
-        fontSize: 11,
-        letterSpacing: 1.7,
-        marginBottom: 12,
-    },
     heroTitle: {
         fontFamily: type.display,
         color: "#fff",
@@ -231,7 +222,6 @@ const s = StyleSheet.create({
         paddingHorizontal: 20,
     },
     secondaryText: { fontFamily: type.bodyBold, color: colors.onSurface },
-
     newsGrid: {
         width: '100%',
         gap: 12,

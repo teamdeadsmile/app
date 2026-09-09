@@ -12,8 +12,6 @@ import {
 const icon = (IconComponent) => ({ color, size }) => (
   <IconComponent weight="bold" color={color} size={size} />
 );
-
-// Botão customizado que força centralização vertical
 const CustomTabButton = ({ children, onPress, accessibilityState }) => {
   const isFocused = accessibilityState?.selected;
 
@@ -42,15 +40,15 @@ export default function TabLayout() {
 
         tabBarStyle: {
           position: "absolute",
-          height: 64,
+          height: 74,
           backgroundColor: colors.surfaceContainer,
           borderWidth: 2,
           borderColor: colors.surfaceContainerHigh,
           borderRadius: 40,
           alignSelf: "center",
-          marginHorizontal: 56,
+          marginHorizontal: 46,
           marginBottom: 36,
-          paddingHorizontal: 12, // padding interno
+          paddingHorizontal: 12,
           paddingVertical: 0,
           elevation: 4,
           shadowColor: "#000",
@@ -58,8 +56,6 @@ export default function TabLayout() {
           shadowOpacity: 0.15,
           shadowRadius: 6,
         },
-
-        // Remove estilos internos que podem interferir
         tabBarItemStyle: {
           padding: 0,
           margin: 0,
@@ -117,9 +113,9 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   tabButton: {
     flex: 1,
-    height: 64, // mesma altura da barra
+    height: 64,
     justifyContent: "flex-start",
-    paddingTop: 12,
+    paddingTop: 17,
     alignItems: "center",
     borderRadius: 30,
     paddingHorizontal: 2,

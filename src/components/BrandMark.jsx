@@ -1,6 +1,6 @@
 import Svg, { Path } from "react-native-svg";
 
-export function BrandMark({ size = 34, color = "#F4F4F1" }) {
+export function BrandMark({ size = 40, color = "#F4F4F1" }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 2000 2000">
       <Path

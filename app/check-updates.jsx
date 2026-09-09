@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Pressable, ScrollView, RefreshControl } from 'react-native';
 import { Screen } from '../src/components/Screen';
 import { TopBar } from '../src/components/TopBar';
 import { MaterialIcon } from '../src/components/MaterialIcon';
 import { colors, type, radius } from '../src/theme/tokens';
 import * as Updates from 'expo-updates';
 import { useRouter } from 'expo-router';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Constants from 'expo-constants';
 
 export default function CheckUpdates() {
   const router = useRouter();
-  const [status, setStatus] = useState('checking'); // 'checking' | 'available' | 'none'
+  const [status, setStatus] = useState('checking'); 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const appVersion = Constants.expoConfig?.version || '1.0.0';
 
   useEffect(() => {
     checkForUpdates();
@@ -23,63 +26,86 @@ export default function CheckUpdates() {
         setStatus('available');
       } else {
         setStatus('none');
-        setTimeout(() => router.back(), 1500);
       }
     } catch (error) {
       console.error('Update check error:', error);
       setStatus('none');
-      setTimeout(() => router.back(), 1500);
     }
   }
 
   async function installUpdate() {
+    setStatus('downloading');
     try {
       await Updates.fetchUpdateAsync();
       await Updates.reloadAsync();
     } catch (error) {
       console.error('Update install error:', error);
+      setStatus('available');
     }
   }
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await checkForUpdates();
+    setRefreshing(false);
+  };
+
   return (
-    <Screen>
-      <TopBar title="Check Updates" />
+    <Screen scroll={true} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+      <TopBar title="Updates" />
+
       <View style={styles.container}>
-        <View style={styles.card}>
-          <Animated.View
-            entering={FadeIn.duration(400)}
-            style={styles.iconContainer}
-          >
-            {status === 'checking' ? (
-              <ActivityIndicator size="large" color={colors.primary} style={styles.spinner} />
-            ) : status === 'available' ? (
-              <MaterialIcon name="download" size={72} color={colors.primary} />
-            ) : (
-              <MaterialIcon name="check-circle" size={72} color={colors.primary} />
-            )}
-          </Animated.View>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.versionLabel}>Current version</Text>
+            <Text style={styles.versionNumber}>v{appVersion}</Text>
+          </View>
+          <View style={styles.statusBadge}>
+            {status === 'checking' && <ActivityIndicator size="small" color={colors.primary} />}
+            {status === 'available' && <Text style={styles.statusAvailable}>Update ready</Text>}
+            {status === 'downloading' && <Text style={styles.statusDownloading}>Downloading…</Text>}
+            {status === 'none' && <Text style={styles.statusUpToDate}>Up to date</Text>}
+          </View>
+        </View>
 
-          <Animated.View entering={FadeInDown.delay(150).duration(400)}>
-            <Text style={styles.title}>
-              {status === 'checking' && 'Checking for Updates'}
-              {status === 'available' && 'Update Ready'}
-              {status === 'none' && 'All Good'}
-            </Text>
-
-            <Text style={styles.message}>
-              {status === 'checking' && 'Please wait while we check for the latest version.'}
-              {status === 'available' && 'A new update is available. Install it now to get the latest features and fixes.'}
-              {status === 'none' && 'Your app is up to date. You\'re running the latest version.'}
-            </Text>
-
-            {status === 'available' && (
+        <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
+          {status === 'available' && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>New version available</Text>
+              <Text style={styles.updateMessage}>
+                A new update is ready to be installed. Please make sure you have a stable internet connection.
+              </Text>
               <Pressable onPress={installUpdate} style={styles.button}>
-                <Text style={styles.buttonText}>Install Now</Text>
+                <Text style={styles.buttonText}>Install now</Text>
                 <MaterialIcon name="arrow-forward" size={20} color={colors.onPrimary} />
               </Pressable>
-            )}
-          </Animated.View>
-        </View>
+            </View>
+          )}
+
+          {status === 'downloading' && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Downloading update</Text>
+              <View style={styles.downloadingContainer}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={styles.downloadingText}>Please wait…</Text>
+              </View>
+            </View>
+          )}
+
+          {status === 'none' && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>All caught up</Text>
+              <Text style={styles.updateMessage}>You're running the latest version of DEADSMILE.</Text>
+            </View>
+          )}
+
+          {status === 'checking' && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Checking for updates</Text>
+              <Text style={styles.updateMessage}>Please wait…</Text>
+            </View>
+          )}
+        </ScrollView>
       </View>
     </Screen>
   );
@@ -88,58 +114,80 @@ export default function CheckUpdates() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.surfaceContainerHigh,
+    marginBottom: 16,
   },
-  card: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
-    padding: 32,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-  },
-  iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.surfaceContainerHigh,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  spinner: {
-    transform: [{ scale: 1.2 }],
-  },
-  title: {
-    fontFamily: type.display,
-    color: colors.onSurface,
-    fontSize: 28,
-    letterSpacing: -0.8,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  message: {
+  versionLabel: {
     fontFamily: type.body,
     color: colors.onSurfaceVariant,
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: 'center',
-    paddingHorizontal: 4,
-    marginBottom: 24,
+    fontSize: 13,
+  },
+  versionNumber: {
+    fontFamily: type.display,
+    color: colors.onSurface,
+    fontSize: 32,
+    letterSpacing: -0.8,
+    marginTop: 2,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceContainerHigh,
+  },
+  statusAvailable: {
+    fontFamily: type.bodyBold,
+    color: colors.primary,
+    fontSize: 12,
+  },
+  statusDownloading: {
+    fontFamily: type.bodyBold,
+    color: colors.primary,
+    fontSize: 12,
+  },
+  statusUpToDate: {
+    fontFamily: type.bodyBold,
+    color: colors.success,
+    fontSize: 12,
+  },
+  body: {
+    flex: 1,
+  },
+  section: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.surfaceContainerHigh,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontFamily: type.display,
+    color: colors.onSurface,
+    fontSize: 24,
+    letterSpacing: -0.6,
+    marginBottom: 8,
+  },
+  updateMessage: {
+    fontFamily: type.body,
+    color: colors.onSurfaceVariant,
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 16,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 10,
     backgroundColor: colors.primary,
-    paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: radius.full,
     shadowColor: colors.primary,
@@ -152,5 +200,16 @@ const styles = StyleSheet.create({
     fontFamily: type.bodyBold,
     color: colors.onPrimary,
     fontSize: 16,
+  },
+  downloadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    gap: 16,
+  },
+  downloadingText: {
+    fontFamily: type.body,
+    color: colors.onSurfaceVariant,
+    fontSize: 14,
   },
 });

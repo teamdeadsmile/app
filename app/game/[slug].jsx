@@ -78,15 +78,17 @@ export default function GameDetail() {
 
       <View style={[s.hero, width > 760 && { minHeight: 620 }]}>
         {heroUrl ? (
-          <Image
-            source={{ uri: heroUrl }}
-            style={StyleSheet.absoluteFill}
-            contentFit="cover"
-          />
+          <>
+            <Image
+              source={{ uri: heroUrl }}
+              style={StyleSheet.absoluteFill}
+              contentFit="cover"
+            />
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000', opacity: 0.75 }]} />
+          </>
         ) : (
           <View style={s.fallback} />
         )}
-        <View style={s.shade} />
         <View style={s.heroBody}>
           <Text style={s.kicker}>
             {(game.status || "GAME").toUpperCase()}
@@ -252,10 +254,6 @@ const s = StyleSheet.create({
   fallback: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.surfaceContainerHigh,
-  },
-  shade: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,.52)",
   },
   heroBody: { padding: 24, paddingTop: 170, maxWidth: 790 },
   kicker: {

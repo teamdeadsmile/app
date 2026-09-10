@@ -1,121 +1,329 @@
-import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'phosphor-react-native';
-import { Screen } from '../src/components/Screen';
-import { BrandMark } from '../src/components/BrandMark';
-import { useAuth } from '../src/context/AuthContext';
-import { useGoBack } from '../src/hooks/useGoBack';
-import { colors, radius, type } from '../src/theme/tokens';
+import { useState } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { useRouter } from "expo-router";
+
+import { Screen } from "../src/components/Screen";
+import { TopBar } from "../src/components/TopBar";
+import { useAuth } from "../src/context/AuthContext";
+import { colors, radius, type } from "../src/theme/tokens";
 
 export default function Login() {
   const router = useRouter();
-  const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const { login, verifyTwoFactor } = useAuth();
+
+  const [mode, setMode] = useState("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [token, setToken] = useState("");
+
+  const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const goBack = useGoBack('/');
 
   async function submit() {
-    if (!email || !password) return;
+    if (busy) {
+      return;
+    }
+
+    setError("");
+
+    /*
+     * Two-factor authentication.
+     */
+    if (mode === "2fa") {
+      const verificationCode = token
+        .replace(/\D/g, "")
+        .slice(0, 6);
+
+      if (verificationCode.length < 6) {
+        setError("Enter the six-digit verification code.");
+        return;
+      }
+
+      setBusy(true);
+
+      try {
+        await verifyTwoFactor(verificationCode);
+        router.replace("/config");
+      } catch (e) {
+        setError(
+          e?.message || "Unable to verify the code."
+        );
+      } finally {
+        setBusy(false);
+      }
+
+      return;
+    }
+
+    /*
+     * Validate credentials before sending the request.
+     */
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail || !password) {
+      setError("Enter your email and password.");
+      return;
+    }
+
     setBusy(true);
-    setError('');
+
     try {
-      await login(email.trim(), password);
-      goBack();
+      /*
+       * The backend login endpoint expects only
+       * email and password.
+       */
+      const result = await login(
+        normalizedEmail,
+        password
+      );
+
+      /*
+       * Account requires two-factor authentication.
+       */
+      if (result?.requiresTwoFactor) {
+        setToken("");
+        setMode("2fa");
+        return;
+      }
+
+      /*
+       * Login completed successfully.
+       */
+      router.replace("/config");
     } catch (e) {
-      setError(e.message || 'Unable to sign in.');
+      setError(
+        e?.message || "Unable to sign in."
+      );
     } finally {
       setBusy(false);
     }
   }
 
+  function switchToLogin() {
+    if (busy) {
+      return;
+    }
+
+    setMode("login");
+    setError("");
+    setToken("");
+  }
+
   return (
     <Screen>
-      <Pressable onPress={goBack} style={s.back}>
-        <ArrowLeft size={22} color={colors.onSurface} weight="bold" />
-      </Pressable>
+      <TopBar
+        title={
+          mode === "2fa"
+            ? "Two-step verification"
+            : "Sign in"
+        }
+        back
+      />
 
-      <View style={s.card}>
-        <BrandMark size={54} color={colors.primary} />
-        <Text style={s.title}>Welcome back.</Text>
-        <Text style={s.copy}>Use the same account as the DEADSMILE website.</Text>
+      <View style={styles.card}>
+        {mode === "2fa" ? (
+          <>
+            <Text style={styles.title}>
+              Verify it's you.
+            </Text>
 
-        <View style={s.field}>
-          <Text style={s.label}>Email</Text>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            placeholder="you@example.com"
-            placeholderTextColor={colors.onSurfaceVariant}
-            style={s.input}
-          />
-        </View>
+            <Text style={styles.copy}>
+              Enter the six-digit code from your
+              authenticator app.
+            </Text>
 
-        <View style={s.field}>
-          <Text style={s.label}>Password</Text>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholder="••••••••"
-            placeholderTextColor={colors.onSurfaceVariant}
-            style={s.input}
-          />
-        </View>
+            <TextInput
+              value={token}
+              onChangeText={setToken}
+              placeholder="000000"
+              placeholderTextColor={
+                colors.onSurfaceVariant
+              }
+              style={[styles.input, styles.code]}
+              keyboardType="number-pad"
+              maxLength={6}
+              autoFocus
+              editable={!busy}
+              autoCorrect={false}
+            />
 
-        {error ? <Text style={s.error}>{error}</Text> : null}
+            {error ? (
+              <Text style={styles.error}>
+                {error}
+              </Text>
+            ) : null}
 
-        <Pressable onPress={submit} disabled={busy} style={s.button}>
-          <Text style={s.buttonText}>{busy ? 'Signing in…' : 'Sign in'}</Text>
-        </Pressable>
+            <Pressable
+              onPress={submit}
+              disabled={
+                busy ||
+                token.replace(/\D/g, "").length < 6
+              }
+              style={[
+                styles.button,
+                (busy ||
+                  token.replace(/\D/g, "").length < 6) && {
+                  opacity: 0.5,
+                },
+              ]}
+            >
+              <Text style={styles.buttonText}>
+                {busy
+                  ? "Verifying…"
+                  : "Verify code"}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={switchToLogin}
+              disabled={busy}
+              style={styles.secondary}
+            >
+              <Text style={styles.secondaryText}>
+                Back to sign in
+              </Text>
+            </Pressable>
+          </>
+        ) : (
+          <>
+            <Text style={styles.title}>
+              Welcome back.
+            </Text>
+
+            <Text style={styles.copy}>
+              Use the same account as the Deadsmile
+              website.
+            </Text>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>
+                Email
+              </Text>
+
+              <TextInput
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                autoComplete="email"
+                textContentType="emailAddress"
+                placeholder="you@example.com"
+                placeholderTextColor={
+                  colors.onSurfaceVariant
+                }
+                style={styles.input}
+                editable={!busy}
+                returnKeyType="next"
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>
+                Password
+              </Text>
+
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="current-password"
+                textContentType="password"
+                placeholder="••••••••"
+                placeholderTextColor={
+                  colors.onSurfaceVariant
+                }
+                style={styles.input}
+                editable={!busy}
+                returnKeyType="go"
+                onSubmitEditing={submit}
+              />
+            </View>
+
+            {error ? (
+              <Text style={styles.error}>
+                {error}
+              </Text>
+            ) : null}
+
+            <Pressable
+              onPress={submit}
+              disabled={busy}
+              style={[
+                styles.button,
+                busy && { opacity: 0.55 },
+              ]}
+            >
+              <Text style={styles.buttonText}>
+                {busy
+                  ? "Signing in…"
+                  : "Sign in"}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() =>
+                router.push("/register")
+              }
+              disabled={busy}
+              style={styles.secondary}
+            >
+              <Text style={styles.secondaryText}>
+                Create an account
+              </Text>
+            </Pressable>
+          </>
+        )}
       </View>
     </Screen>
   );
 }
 
-const s = StyleSheet.create({
-  back: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.surfaceContainer,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+const styles = StyleSheet.create({
   card: {
-     marginTop: 12,
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: 520,
-    borderRadius: radius.xl,
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 540,
     backgroundColor: colors.surface,
+    borderRadius: radius.xl,
     padding: 26,
-    gap: 16,
+    gap: 15,
+    marginTop: 12,
   },
+
   title: {
     fontFamily: type.display,
     color: colors.onSurface,
-    fontSize: 40,
-    letterSpacing: -1.8,
+    fontSize: 42,
+    letterSpacing: -1.9,
   },
+
   copy: {
     fontFamily: type.body,
     color: colors.onSurfaceVariant,
+    lineHeight: 21,
   },
+
   field: {
     gap: 7,
   },
+
   label: {
     fontFamily: type.bodyBold,
     color: colors.onSurfaceVariant,
-    fontSize: 11,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
+    fontSize: 10,
+    letterSpacing: 0.9,
+    textTransform: "uppercase",
   },
+
   input: {
     height: 54,
     borderRadius: radius.md,
@@ -123,20 +331,45 @@ const s = StyleSheet.create({
     paddingHorizontal: 16,
     color: colors.onSurface,
     fontFamily: type.body,
+    fontSize: 15,
   },
+
+  code: {
+    fontFamily: type.display,
+    fontSize: 28,
+    letterSpacing: 8,
+    textAlign: "center",
+  },
+
   error: {
     fontFamily: type.body,
     color: colors.error,
+    lineHeight: 20,
   },
+
   button: {
     height: 52,
     borderRadius: 26,
     backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
+
   buttonText: {
     fontFamily: type.bodyBold,
     color: colors.onPrimary,
+  },
+
+  secondary: {
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.surfaceContainerHigh,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  secondaryText: {
+    fontFamily: type.bodyBold,
+    color: colors.onSurface,
   },
 });

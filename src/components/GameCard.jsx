@@ -4,9 +4,11 @@ import { useRouter } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors, radius, type } from '../theme/tokens';
 import { resolveAssetUrl } from '../utils/resolveAsset';
+import { useSettings } from '../context/SettingsContext';
 
 export function GameCard({ game, index = 0, horizontal = false }) {
   const router = useRouter();
+  const { settings, accent } = useSettings();
 
   const imageSource =
     game.coverImage ||
@@ -16,11 +18,10 @@ export function GameCard({ game, index = 0, horizontal = false }) {
     null;
 
   const imageUrl = resolveAssetUrl(imageSource);
-  console.log('GameCard image:', { imageSource, imageUrl, gameTitle: game.title });
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(Math.min(index, 8) * 45).duration(380)}
+      entering={settings.animations ? FadeInDown.delay(Math.min(index, 8) * 45).duration(380) : undefined}
       style={horizontal ? s.wrapH : s.wrap}
     >
       <Pressable
@@ -34,7 +35,7 @@ export function GameCard({ game, index = 0, horizontal = false }) {
               style={StyleSheet.absoluteFill}
               contentFit="cover"
               transition={220}
-              onError={(e) => console.warn('Image load error:', e)}
+
             />
           ) : (
             <View style={s.placeholder} />
@@ -49,7 +50,7 @@ export function GameCard({ game, index = 0, horizontal = false }) {
             {game.title}
           </Text>
           <Text numberOfLines={2} style={s.desc}>
-            {game.shortDescription || game.short_description || 'DEADSMILE'}
+            {game.shortDescription || game.short_description || 'Deadsmile'}
           </Text>
           {Array.isArray(game.platforms) && game.platforms.length > 0 && (
             <Text numberOfLines={1} style={s.meta}>

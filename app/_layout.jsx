@@ -5,12 +5,13 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_700Bold } from '@expo-google-fonts/manrope';
 import { SpaceGrotesk_600SemiBold, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { AuthProvider } from '../src/context/AuthContext';
+import { SettingsProvider } from '../src/context/SettingsContext';
 import { colors, type } from '../src/theme/tokens';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Updates from 'expo-updates';
 import * as SplashScreen from 'expo-splash-screen';
 SplashScreen.preventAutoHideAsync();
-const MIN_DISPLAY_TIME = 10000;
+const MIN_DISPLAY_TIME = 0;
 
 export default function RootLayout() {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -23,6 +24,7 @@ export default function RootLayout() {
   });
 
   async function checkForUpdates() {
+    if (!Updates.isEnabled) return;
     try {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
@@ -67,8 +69,9 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <StatusBar style="light" backgroundColor={colors.background} />
+      <SettingsProvider>
+          <AuthProvider>
+            <StatusBar style="light" backgroundColor={colors.background} />
         <Stack
           screenOptions={{
             headerShown: false,
@@ -80,15 +83,18 @@ export default function RootLayout() {
           <Stack.Screen name="game/[slug]" />
           <Stack.Screen name="news/[slug]" />
           <Stack.Screen name="video/[id]" />
-          <Stack.Screen name="account" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="account" options={{ presentation: "modal" }} />
+          <Stack.Screen name="config" options={{ presentation: "modal" }} />
+          <Stack.Screen name="register" options={{ presentation: "modal" }} />
           <Stack.Screen name="search" options={{ presentation: 'modal' }} />
           <Stack.Screen name="check-updates" options={{ presentation: 'modal' }} />
           <Stack.Screen name="login" options={{ presentation: 'modal' }} />
           <Stack.Screen name="admin/newsletter" options={{ presentation: 'modal' }} />
           <Stack.Screen name="admin/video" options={{ presentation: 'modal' }} />
           <Stack.Screen name="admin/game" options={{ presentation: 'modal' }} />
-        </Stack>
-      </AuthProvider>
+          </Stack>
+          </AuthProvider>
+        </SettingsProvider>
     </SafeAreaProvider>
   );
 }

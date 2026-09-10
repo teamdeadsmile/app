@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Pressable, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Pressable, RefreshControl } from 'react-native';
 import { Screen } from '../src/components/Screen';
 import { TopBar } from '../src/components/TopBar';
 import { MaterialIcon } from '../src/components/MaterialIcon';
@@ -68,7 +68,7 @@ export default function CheckUpdates() {
           </View>
         </View>
 
-        <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
+        <View style={styles.body}>
           {status === 'available' && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>New version available</Text>
@@ -95,7 +95,7 @@ export default function CheckUpdates() {
           {status === 'none' && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>All caught up</Text>
-              <Text style={styles.updateMessage}>You're running the latest version of DEADSMILE.</Text>
+              <Text style={styles.updateMessage}>You're running the latest version of Deadsmile.</Text>
             </View>
           )}
 
@@ -105,7 +105,7 @@ export default function CheckUpdates() {
               <Text style={styles.updateMessage}>Please wait…</Text>
             </View>
           )}
-        </ScrollView>
+        </View>
       </View>
     </Screen>
   );

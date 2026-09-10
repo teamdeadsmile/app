@@ -237,6 +237,7 @@ export default function GameDetail() {
 const s = StyleSheet.create({
   back: {
     width: 48,
+    marginTop: 12,
     height: 48,
     borderRadius: 24,
     backgroundColor: colors.surfaceContainer,

@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View, ScrollView } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcon } from '../../src/components/MaterialIcon';
 import { Screen } from '../../src/components/Screen';
 import { TopBar } from '../../src/components/TopBar';
 import { colors, radius, type } from '../../src/theme/tokens';
 import { api } from '../../src/services/api';
-import { useAuth } from '../../src/context/AuthContext';
 
 export default function AdminNewsletter() {
   const router = useRouter();
-  const { refresh } = useAuth();
   const [form, setForm] = useState({ title: '', excerpt: '', body: '', image: '' });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -36,7 +34,7 @@ export default function AdminNewsletter() {
   return (
     <Screen>
       <TopBar title="Publish Newsletter" back />
-      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <View style={styles.container}>
         <View style={styles.field}>
           <Text style={styles.label}>Title</Text>
           <TextInput style={styles.input} value={form.title} onChangeText={set('title')} placeholder="Title" placeholderTextColor={colors.onSurfaceVariant} />
@@ -60,7 +58,7 @@ export default function AdminNewsletter() {
         <Pressable style={[styles.button, saving && styles.buttonDisabled]} onPress={submit} disabled={saving}>
           <Text style={styles.buttonText}>{saving ? 'Publishing…' : 'Publish'}</Text>
         </Pressable>
-      </ScrollView>
+      </View>
     </Screen>
   );
 }

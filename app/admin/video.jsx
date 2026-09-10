@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View, ScrollView } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcon } from '../../src/components/MaterialIcon';
 import { Screen } from '../../src/components/Screen';
@@ -38,7 +38,7 @@ export default function AdminVideo() {
   return (
     <Screen>
       <TopBar title="Publish Video" back />
-      <ScrollView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.field}>
           <Text style={styles.label}>Title</Text>
           <TextInput style={styles.input} value={form.title} onChangeText={set('title')} placeholder="Title" />
@@ -64,7 +64,7 @@ export default function AdminVideo() {
         <Pressable style={[styles.button, saving && styles.buttonDisabled]} onPress={submit} disabled={saving}>
           <Text style={styles.buttonText}>{saving ? 'Publishing…' : 'Publish'}</Text>
         </Pressable>
-      </ScrollView>
+      </View>
     </Screen>
   );
 }

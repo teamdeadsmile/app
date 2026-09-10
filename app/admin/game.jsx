@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, Switch } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcon } from '../../src/components/MaterialIcon';
 import { Screen } from '../../src/components/Screen';
@@ -58,7 +58,7 @@ export default function AdminGame() {
   return (
     <Screen>
       <TopBar title="Publish Game" back />
-      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <View style={styles.container}>
         <View style={styles.field}>
           <Text style={styles.label}>Title</Text>
           <TextInput style={styles.input} value={form.title} onChangeText={setField('title')} placeholder="Game title" placeholderTextColor={colors.onSurfaceVariant} />
@@ -143,7 +143,7 @@ export default function AdminGame() {
         <Pressable style={[styles.button, saving && styles.buttonDisabled]} onPress={submit} disabled={saving}>
           <Text style={styles.buttonText}>{saving ? 'Publishing…' : 'Publish'}</Text>
         </Pressable>
-      </ScrollView>
+      </View>
     </Screen>
   );
 }

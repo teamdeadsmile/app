@@ -82,6 +82,7 @@ const s = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: colors.surfaceContainer,
     alignItems: 'center',
+    marginTop: 12,
     justifyContent: 'center',
     marginBottom: 16,
     marginTop: 12,

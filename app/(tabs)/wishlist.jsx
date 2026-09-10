@@ -38,7 +38,7 @@ export default function Wishlist() {
                         Sign in to view your wishlist
                     </Text>
                     <Text style={s.copy}>
-                        The wishlist uses the real DEADSMILE backend session.
+                        The wishlist uses the real Deadsmile backend session.
                     </Text>
                     <Pressable
                         onPress={() => router.push("/login")}

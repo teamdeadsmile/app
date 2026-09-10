@@ -39,7 +39,7 @@ export default function Search() {
   const gap = 12;
   const screenPadding = 20;
   const totalWidth = width - screenPadding * 2;
-  const itemWidth = (totalWidth - gap * (cols - 1)) / cols;
+  const itemWidth = `${((totalWidth - gap * (cols - 1)) / totalWidth) * 100}%`;
 
   return (
     <Screen>
@@ -71,10 +71,7 @@ export default function Search() {
         {items.map((g, i) => (
           <View
             key={g.id}
-            style={{
-              width: '100%',
-              marginBottom: gap,
-            }}
+            style={{ width: itemWidth }}
           >
             <GameCard
               game={{
@@ -99,7 +96,7 @@ const s = StyleSheet.create({
   back: {
     width: 48,
     height: 48,
-     marginTop: 12,
+    marginTop: 12,
     borderRadius: 24,
     backgroundColor: colors.surfaceContainer,
     alignItems: 'center',

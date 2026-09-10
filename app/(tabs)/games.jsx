@@ -1,55 +1,49 @@
-import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import { Screen } from '../../src/components/Screen';
-import { TopBar } from '../../src/components/TopBar';
-import { GameCard } from '../../src/components/GameCard';
-import { StateView } from '../../src/components/StateView';
-import { useApiData } from '../../src/hooks/useApiData';
-import { colors, type } from '../../src/theme/tokens';
-import { resolveAssetUrl } from '../../src/utils/resolveAsset';
+import { StyleSheet, Text, View } from "react-native";
+import { Screen } from "../../src/components/Screen";
+import { TopBar } from "../../src/components/TopBar";
+import { GameCard } from "../../src/components/GameCard";
+import { StateView } from "../../src/components/StateView";
+import { useApiData } from "../../src/hooks/useApiData";
+import { colors, type } from "../../src/theme/tokens";
+import { resolveAssetUrl } from "../../src/utils/resolveAsset";
 
 export default function Games() {
-  const { width } = useWindowDimensions();
-  const q = useApiData('/games', { limit: 40 }, { items: [] });
+  const q = useApiData("/games", { limit: 40 }, { items: [] });
   const games = q.data?.items || [];
-
-  const cols = width >= 1000 ? 4 : width >= 680 ? 3 : 2;
-  const gap = 12;
-  const screenPadding = 20;
-  const totalWidth = width - screenPadding * 2;
-  const itemWidth = Math.floor((totalWidth - gap * (cols - 1)) / cols);
 
   return (
     <Screen>
       <TopBar title="Games" />
 
-      <View style={s.head}>
-        <Text style={s.title}>Games</Text>
-        <Text style={s.copy}>
-          All games with details, platforms, screenshots, trailers, and official links.
+      <View style={styles.head}>
+        <Text style={styles.title}>Games</Text>
+
+        <Text style={styles.copy}>
+          Explore every Deadsmile game, from announcement to release.
         </Text>
       </View>
 
-      {q.status !== 'success' ? (
+      {q.status !== "success" ? (
         <StateView
-          loading={q.status === 'loading'}
+          loading={q.status === "loading"}
           error={q.error}
           onRetry={q.retry}
         />
-      ) : games.length > 0 ? (
-        <View style={s.grid}>
+      ) : games.length ? (
+        <View style={styles.list}>
           {games.map((game, index) => (
             <View
-              key={game.id}
-              style={{
-                width: '100%',
-                marginBottom: gap,
-                flexShrink: 0,
-              }}
+              key={game.id || game.slug || index}
+              style={styles.cardWrapper}
             >
               <GameCard
                 game={{
                   ...game,
-                  coverImage: resolveAssetUrl(game.coverImage || game.heroImage),
+                  coverImage: resolveAssetUrl(
+                    game.coverImage ||
+                      game.heroImage ||
+                      game.cover_image
+                  ),
                 }}
                 index={index}
               />
@@ -63,29 +57,41 @@ export default function Games() {
   );
 }
 
-const s = StyleSheet.create({
+const styles = StyleSheet.create({
   head: {
-    paddingVertical: 24,
+    paddingVertical: 22,
     maxWidth: 720,
   },
+
+  eyebrow: {
+    fontFamily: type.bodyBold,
+    color: colors.primary,
+    fontSize: 10,
+    letterSpacing: 1.6,
+    marginBottom: 5,
+  },
+
   title: {
     fontFamily: type.display,
     color: colors.onSurface,
     fontSize: 54,
     letterSpacing: -2.5,
     lineHeight: 56,
-    marginTop: 4,
   },
+
   copy: {
     fontFamily: type.body,
     color: colors.onSurfaceVariant,
     lineHeight: 22,
-    marginTop: 12,
+    marginTop: 10,
   },
-  grid: {
-    flexDirection: 'column',
-    flexWrap: 'wrap',
-    width: '100%',
-    gap: 12,
+
+  list: {
+    width: "100%",
+    gap: 14,
+  },
+
+  cardWrapper: {
+    width: "100%",
   },
 });

@@ -1,9 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
-import { MaterialIcon } from "./MaterialIcon";
-import { ArrowsClockwise } from 'phosphor-react-native';
-import { User } from 'phosphor-react-native';
-import { MagnifyingGlass } from 'phosphor-react-native';
+import { GearSix, MagnifyingGlass, ArrowsClockwise } from "phosphor-react-native";
 import { BrandMark } from "./BrandMark";
 import { colors, radius, type } from "../theme/tokens";
 import { useGoBack } from "../hooks/useGoBack";
@@ -15,32 +12,32 @@ export function TopBar({ title, back = false }) {
     <View style={styles.bar}>
       <View style={styles.left}>
         {back ? (
-          <Pressable onPress={goBack} style={styles.iconBtn}>
-            <MaterialIcon name="arrow-back" size={22} color={colors.onSurface} />
+          <Pressable onPress={goBack} style={styles.iconBtn} accessibilityLabel="Go back">
+            <Text style={styles.backArrow}>‹</Text>
           </Pressable>
         ) : (
-         <Link href="/" asChild>
-            <Pressable>
-                <BrandMark size={50} />
+          <Link href="/" asChild>
+            <Pressable style={styles.brand} accessibilityLabel="Deadsmile home">
+              <BrandMark size={50} />
             </Pressable>
-        </Link>
+          </Link>
         )}
       </View>
 
       <View style={styles.actions}>
         <Link href="/search" asChild>
-          <Pressable style={styles.iconBtn}>
-            <MagnifyingGlass size={22} weight="bold" color={colors.onSurface} />
+          <Pressable style={styles.iconBtn} accessibilityLabel="Search">
+            <MagnifyingGlass size={20} weight="bold" color={colors.onSurface} />
           </Pressable>
         </Link>
         <Link href="/check-updates" asChild>
-            <Pressable style={styles.iconBtn}>
-                <ArrowsClockwise size={22} weight="bold" color={colors.onSurface} />
-            </Pressable>
+          <Pressable style={styles.iconBtn} accessibilityLabel="Check for updates">
+            <ArrowsClockwise size={20} weight="bold" color={colors.onSurface} />
+          </Pressable>
         </Link>
-        <Link href="/account" asChild>
-          <Pressable style={styles.iconBtn}>
-            <User size={22} weight="bold" color={colors.onSurface} />
+        <Link href="/config" asChild>
+          <Pressable style={styles.iconBtn} accessibilityLabel="Settings">
+            <GearSix size={20} weight="bold" color={colors.onSurface} />
           </Pressable>
         </Link>
       </View>
@@ -50,28 +47,21 @@ export function TopBar({ title, back = false }) {
 
 const styles = StyleSheet.create({
   bar: {
-    height: 74,
+    minHeight: 72,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 12,
+    gap: 16,
   },
-  left: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    flex: 1,
-  },
-  actions: {
-    flexDirection: "row",
-    gap: 6,
-  },
+  left: { flexDirection: "row", alignItems: "center", gap: 14, flex: 1, minWidth: 0 },
+  brand: { flexDirection: "row", alignItems: "center", gap: 9 },
+  brandName: { fontFamily: type.display, color: colors.onSurface, fontSize: 15, letterSpacing: 1.2 },
+  brandSub: { fontFamily: type.bodyBold, color: colors.onSurfaceVariant, fontSize: 8, letterSpacing: 2.4, marginTop: 1 },
+  pageTitle: { fontFamily: type.displayMedium, color: colors.onSurfaceVariant, fontSize: 14, marginLeft: 6 },
+  actions: { flexDirection: "row", gap: 7 },
   iconBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.full,
-    backgroundColor: colors.surfaceContainer,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 42, height: 42, borderRadius: radius.full, backgroundColor: colors.surfaceContainer,
+    alignItems: "center", justifyContent: "center",
   },
+  backArrow: { color: colors.onSurface, fontSize: 32, lineHeight: 34, fontFamily: type.body },
 });

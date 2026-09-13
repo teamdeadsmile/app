@@ -31,10 +31,6 @@ export default function Login() {
     }
 
     setError("");
-
-    /*
-     * Two-factor authentication.
-     */
     if (mode === "2fa") {
       const verificationCode = token
         .replace(/\D/g, "")
@@ -60,10 +56,6 @@ export default function Login() {
 
       return;
     }
-
-    /*
-     * Validate credentials before sending the request.
-     */
     const normalizedEmail = email.trim().toLowerCase();
 
     if (!normalizedEmail || !password) {
@@ -74,27 +66,15 @@ export default function Login() {
     setBusy(true);
 
     try {
-      /*
-       * The backend login endpoint expects only
-       * email and password.
-       */
       const result = await login(
         normalizedEmail,
         password
       );
-
-      /*
-       * Account requires two-factor authentication.
-       */
       if (result?.requiresTwoFactor) {
         setToken("");
         setMode("2fa");
         return;
       }
-
-      /*
-       * Login completed successfully.
-       */
       router.replace("/config");
     } catch (e) {
       setError(

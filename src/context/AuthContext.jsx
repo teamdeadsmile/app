@@ -37,19 +37,12 @@ export function AuthProvider({ children }) {
     refresh();
   }, [refresh]);
 
-  /*
-   * Login uses only email and password.
-   * No reCAPTCHA token is sent to the backend.
-   */
   const login = useCallback(async (email, password) => {
     const result = await api.post("/auth/mobile-login", {
       email,
       password,
     });
 
-    /*
-     * The backend requires two-factor authentication.
-     */
     if (result?.requiresTwoFactor) {
       setUser(null);
       setTwoFactor(true);
@@ -58,19 +51,12 @@ export function AuthProvider({ children }) {
       return result;
     }
 
-    /*
-     * Normal authenticated session.
-     */
     setTwoFactor(false);
     setUser(result);
     setStatus("authenticated");
 
     return result;
   }, []);
-
-  /*
-   * Complete two-factor authentication.
-   */
   const verifyTwoFactor = useCallback(async (token) => {
     const me = await api.post("/auth/verify-2fa", {
       token,
@@ -82,10 +68,6 @@ export function AuthProvider({ children }) {
 
     return me;
   }, []);
-
-  /*
-   * Register a new account.
-   */
   const register = useCallback(async (payload) => {
     const me = await api.post("/auth/mobile-register", payload);
 
@@ -95,10 +77,6 @@ export function AuthProvider({ children }) {
 
     return me;
   }, []);
-
-  /*
-   * End the current session.
-   */
   const logout = useCallback(async () => {
     try {
       await api.post("/auth/logout");
